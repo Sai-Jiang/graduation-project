@@ -1,5 +1,51 @@
 # 毕业设计——基于数字喷泉码和UDP协议的视频传输Demo
 
+一年后看本科毕设写的代码，怎么看都非常不舒服！忍不住要改一下。
+
+## 一、改Makefile
+
+曾经Makefile写的不熟练，先把这块改了。小项目用Makefile组织还是挺简单的，所有文件不分层次地堆在一个目录下，写清楚编译依赖关系，写清楚编译和链接命令。
+
+1. 首先，在写程序的时候，include头文件的时候要洁癖，没有用到的头文件就不要include进去。
+
+2. 定义编译参数、链接参数等变量，这些变量的名字和含义可以参考一些开源项目的`./configure --help`。
+```
+CC          C compiler command
+CFLAGS      C compiler flags
+LDFLAGS     linker flags, e.g. -L<lib dir> if you have libraries in a
+nonstandard directory <lib dir>
+LIBS        libraries to pass to the linker, e.g. -l<library>
+CPPFLAGS    (Objective) C/C++ preprocessor flags, e.g. -I<include dir> if
+you have headers in a nonstandard directory <include dir>
+CPP         C preprocessor
+LT_SYS_LIBRARY_PATH
+User-defined run-time library search path.
+```
+
+3. 写一条编译规则，所有的.o文件都由同样的编译命令生成，只是依赖的.cpp文件不一样。
+```
+%.o: %cpp
+	$(CC) -c $(CFLAGS) $(CPPFLAGS) -o $@ $<
+```
+
+4. 依次编写所有可执行文件的链接规则。这里要一条一条的手写，因为不像.o与.cpp文件那样一一对应，一个可执行文件依赖哪些目标文件需要具体分析。
+
+5. 编写clean伪目标。
+
+## 二、UDPServer和UDPClient基类的设计
+
+当年，怎么脑抽了，基类里面混入了UDPEncodedServer、UDPEncodedClient里面才应该有的Encoder、Serializer，统统挪到对应的子类里面，并且修改include关系。
+
+## 三、改变量名
+
+当初的有一些变量在定义的时候太节省笔墨，现在自己的程序都有点看不懂了。
+
+## 四、强化对stdint中明确size的整数类型的使用
+
+当初，只在序列化接序列化的时候使用了stdint中的类型，使用的范围不够广泛，而且用了许多隐式/强制类型转换。现在认为，应该广泛使用stdint中的类型，局部才能考虑使用普通的不指明size的整数类型。
+
+---------------------------------------------------------------------------------------
+
 ![image](https://github.com/28hua/graduation-project/raw/master/compare.png)
 
 左图：没有经过编码；右图：经过LT码编码。
@@ -13,6 +59,3 @@
 方才提到阻塞队列和专门的译码线程。毕设的仓库里有一个阻塞队列的简单实现——BlockQueue.h。原理其实非常简单，使用了最基础的同步原语互斥量和条件变量：生产者线程push(element)时锁住队列，push完成后通知消费者线程，然后解锁；消费者线程pop()element时锁住队列，等待push通知队列非空，然后pop，完成后通知生产者队列不满，解锁。阻塞队列就像shell中的管道，网络协议里的TCP，是居家旅行杀人越货的必备的小东东。
 
 这套小程序原本想要放在无人机上试一下，但是昨天上午起飞前无人机侧翻，一个螺旋浆扎进了草里，电机烧了，怕是飞不成了。
-
-扫码关注xiaoyang-said：
-![image](https://github.com/28hua/graduation-project/raw/master/weixin.jpg)

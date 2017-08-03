@@ -1,6 +1,4 @@
 #pragma once
-#include "Encoder.h"
-#include "Serializer.h"
 #include <string>
 #include <boost/asio.hpp>
 
@@ -11,7 +9,6 @@ class UDPServer
 {
 public:
 	UDPServer(
-		const Encoder& e,
 		const std::string& sender_ip,
 		const std::string& receiver_ip,
 		unsigned sender_port = 8080,
@@ -21,8 +18,6 @@ public:
 	virtual void do_read() = 0;
 
 protected:
-	Encoder e;
-	Serializer s;
     std::vector<char> buf;
 	io_service ioservice;
 	udp::endpoint sender_addr;

@@ -10,7 +10,7 @@ class PaddingPackage
 public:
 	PaddingPackage(const Encoder& e);
 	PaddingPackage(const Encoder& e, const std::vector<char>& rdata);
-	PaddingPackage(const Encoder& e, char* rdata, size_t rsize);
+	PaddingPackage(const Encoder& e, const char* rdata, size_t rsize);
 	~PaddingPackage();
     std::pair<char*, size_t> getRawData();
     size_t getindex();

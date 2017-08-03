@@ -9,8 +9,8 @@ class Serializer
 public:
 	Serializer();
 	~Serializer();
-    std::vector<char> serialize(const EncodedPackage& ep);
-	EncodedPackage deserialize(const std::vector<char>& rd);
-	EncodedPackage deserialize(const std::vector<char>& rd, size_t N);
+    std::vector<char> serialize(const EncodedPackage& encodedpackage);
+	EncodedPackage deserialize(const std::vector<char>& rawbytes);
+	EncodedPackage deserialize(const std::vector<char>& rawbytes, size_t N);
 };
 

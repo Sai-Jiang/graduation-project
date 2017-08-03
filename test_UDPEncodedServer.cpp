@@ -1,8 +1,8 @@
-#include "common.h"
+#include "Encoder.h"
+#include "UDPEncodedServer.h"
+#include <stdio.h>
 
-
-int
-main(int argc, char* argv[]) {
+int main(int argc, char* argv[]) {
     if (argc != 3) {
         fprintf(stderr, "./UDPEncodedServer <sender ip> <receiver ip>\n");
     } else {
@@ -22,7 +22,7 @@ main(int argc, char* argv[]) {
                 );
         */
         Encoder e;
-        UDPEncodedServer server(e, argv[1],argv[2]);
+        UDPEncodedServer server(e, argv[1], argv[2]);
         server.run();
     }
     return 0;

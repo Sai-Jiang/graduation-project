@@ -1,7 +1,13 @@
 CC=g++
-CFLAGS=-I. -Wall -std=c++11 -lm -O3 
+CFLAGS=-Wall -O2 
+LDFLAGS=
+LIBS=-lm -lboost_system -lpthread
+CPPFLAGS=
 
 OBJS= EncodedPackage.o Encoder.o PaddingPackage.o Serializer.o RobustSolitonDistribution.o \
+
+%.o: %cpp
+	$(CC) -c $(CFLAGS) $(CPPFLAGS) -o $@ $<
 
 all: test_Encoder test_UDPRawServer test_UDPRawClient test_UDPEncodedServer test_UDPEncodedClient
 
@@ -20,53 +26,34 @@ test_UDPEncodedServer: UDPServer.o UDPEncodedServer.o test_UDPEncodedServer.o $(
 test_UDPEncodedClient: UDPClient.o UDPEncodedClient.o test_UDPEncodedClient.o $(OBJS)
 	$(CC) $(CFLAGS) -lboost_system -lpthread $^ -o $@
 
-test_Encoder.o: test_Encoder.cpp
-	$(CC) $(CFLAGS) -c test_Encoder.cpp
-
-test_UDPRawServer.o: test_UDPRawServer.cpp
-	$(CC) $(CFLAGS) -c test_UDPRawServer.cpp
-
-test_UDPRawClient.o: test_UDPRawClient.cpp
-	$(CC) $(CFLAGS) -c test_UDPRawClient.cpp
-
-test_UDPEncodedServer.o: test_UDPEncodedServer.cpp
-	$(CC) $(CFLAGS) -c test_UDPEncodedServer.cpp
-
-test_UDPEncodedClient.o: test_UDPEncodedClient.cpp
-	$(CC) $(CFLAGS) -c test_UDPEncodedClient.cpp
-
-EncodedPackage.o: EncodedPackage.cpp
-	$(CC) $(CFLAGS) -c EncodedPackage.cpp
-
-Encoder.o: Encoder.cpp
-	$(CC) $(CFLAGS) -c Encoder.cpp
-
-PaddingPackage.o: PaddingPackage.cpp
-	$(CC) $(CFLAGS) -c PaddingPackage.cpp
-
-Serializer.o: Serializer.cpp
-	$(CC) $(CFLAGS) -c Serializer.cpp
-
-RobustSolitonDistribution.o: RobustSolitonDistribution.cpp
-	$(CC) $(CFLAGS) -c RobustSolitonDistribution.cpp
-
-UDPServer.o: UDPServer.cpp
-	$(CC) $(CFLAGS) -c UDPServer.cpp
-
-UDPRawServer.o:UDPRawServer.cpp
-	$(CC) $(CFLAGS) -c UDPRawServer.cpp
-
-UDPEncodedServer.o: UDPEncodedServer.cpp
-	$(CC) $(CFLAGS) -c UDPEncodedServer.cpp
-
-UDPClient.o: UDPClient.cpp
-	$(CC) $(CFLAGS) -c UDPClient.cpp
-
-UDPRawClient.o: UDPRawClient.cpp
-	$(CC) $(CFLAGS) -c UDPRawClient.cpp
-
-UDPEncodedClient.o: UDPEncodedClient.cpp
-	$(CC) $(CFLAGS) -c UDPEncodedClient.cpp
+EncodedPackage.o: EncodedPackage.cpp EncodedPackage.h
+Encoder.o: Encoder.cpp Encoder.h RobustSolitonDistribution.h \
+ EncodedPackage.h PaddingPackage.h
+PaddingPackage.o: PaddingPackage.cpp PaddingPackage.h Encoder.h \
+ RobustSolitonDistribution.h
+RobustSolitonDistribution.o: RobustSolitonDistribution.cpp \
+ RobustSolitonDistribution.h
+Serializer.o: Serializer.cpp Serializer.h EncodedPackage.h
+test_Encoder.o: test_Encoder.cpp Encoder.h RobustSolitonDistribution.h \
+ Serializer.h EncodedPackage.h PaddingPackage.h
+test_UDPEncodedClient.o: test_UDPEncodedClient.cpp Encoder.h \
+ RobustSolitonDistribution.h UDPEncodedClient.h BlockQueue.h \
+ EncodedPackage.h Serializer.h UDPClient.h
+test_UDPEncodedServer.o: test_UDPEncodedServer.cpp Encoder.h \
+ RobustSolitonDistribution.h UDPEncodedServer.h BlockQueue.h Serializer.h \
+ EncodedPackage.h UDPServer.h
+test_UDPRawClient.o: test_UDPRawClient.cpp UDPRawClient.h UDPClient.h
+test_UDPRawServer.o: test_UDPRawServer.cpp UDPRawServer.h UDPServer.h
+UDPClient.o: UDPClient.cpp UDPClient.h
+UDPEncodedClient.o: UDPEncodedClient.cpp UDPEncodedClient.h BlockQueue.h \
+ EncodedPackage.h Encoder.h RobustSolitonDistribution.h Serializer.h \
+ UDPClient.h PaddingPackage.h
+UDPEncodedServer.o: UDPEncodedServer.cpp UDPEncodedServer.h BlockQueue.h \
+ Encoder.h RobustSolitonDistribution.h Serializer.h EncodedPackage.h \
+ UDPServer.h PaddingPackage.h
+UDPRawClient.o: UDPRawClient.cpp UDPRawClient.h UDPClient.h
+UDPRawServer.o: UDPRawServer.cpp UDPRawServer.h UDPServer.h
+UDPServer.o: UDPServer.cpp UDPServer.h
 
 .PHONY: clean
 

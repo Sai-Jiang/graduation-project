@@ -1,4 +1,7 @@
-#include "common.h"
+#include "Encoder.h"
+#include "Serializer.h"
+#include "PaddingPackage.h"
+#include <vector>
 #include <iostream>
 #include <fstream>
 #include <iterator>

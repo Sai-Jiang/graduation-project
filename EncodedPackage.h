@@ -1,4 +1,6 @@
 #pragma once
+
+#include <stdint.h>
 #include <vector>
 #include <iostream>
 
@@ -15,13 +17,13 @@ class EncodedPackage
 public:
 	EncodedPackage();
 	~EncodedPackage();
-	unsigned getd();
-	unsigned getindex();
+	uint32_t getd();
+	uint32_t getindex();
 
 private:
-	unsigned index; //所属原包的索引
-	unsigned d; //此编码包的度
-    std::vector<unsigned> adjacency; //邻接关系
+	uint32_t index; //所属原包的索引
+	uint32_t d; //此编码包的度
+    std::vector<uint32_t> adjacency; //邻接关系
     std::vector<char> data; //编码后的数据
 };
 

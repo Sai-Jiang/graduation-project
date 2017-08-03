@@ -1,76 +1,46 @@
 #include "Serializer.h"
 #include <algorithm>
-#include <cstdint>
 #include <cassert>
+#include <cstdint>
 
-Serializer::Serializer()
-{
+Serializer::Serializer() {}
+
+Serializer::~Serializer() {}
+
+std::vector<char> Serializer::serialize(const EncodedPackage& encodedpackage) {
+    std::vector<char> rawbytes;
+    char c[4];
+
+    *(uint32_t*)c = encodedpackage.index;
+    rawbytes.insert(rawbytes.end(), c, c + 4);
+
+    *(uint32_t*)c = encodedpackage.d;
+    rawbytes.insert(rawbytes.end(), c, c + 4);
+
+    for (size_t i = 0; i < encodedpackage.d; i++) {
+        *(uint32_t*)c = encodedpackage.adjacency[i];
+        rawbytes.insert(rawbytes.end(), c, c + 4);
+    }
+
+    rawbytes.insert(rawbytes.end(), encodedpackage.data.begin(), encodedpackage.data.end());
+
+    return rawbytes;
 }
 
+EncodedPackage Serializer::deserialize(const std::vector<char>& rawbytes) {
+    assert(rawbytes.size() >= 4 * 2);
+    EncodedPackage encodedpackage;
 
-Serializer::~Serializer()
-{
-}
+    encodedpackage.index = *(uint32_t*)rawbytes.data();
 
-std::vector<char>
-Serializer::serialize(const EncodedPackage & ep)
-{
-    std::vector<char> rv;
-	char c[4];
+    encodedpackage.d = *(uint32_t*)(rawbytes.data() + 4);
 
-	*(uint32_t*)c = ep.index;
-	rv.insert(rv.end(), c, c + 4);
+    for (size_t i = 0; i < encodedpackage.d; i++) {
+        unsigned d = *(uint32_t*)(rawbytes.data() + 4 * (2 + i));
+        encodedpackage.adjacency.push_back(d);
+    }
 
-	*(uint32_t*)c = ep.d;
-	rv.insert(rv.end(), c, c + 4);
+    encodedpackage.data.insert(encodedpackage.data.end(), rawbytes.begin() + 4 * (2 + encodedpackage.d), rawbytes.end());
 
-	for (size_t i = 0; i < ep.d; i++) {
-		*(uint32_t*)c = ep.adjacency[i];
-		rv.insert(rv.end(), c, c + 4);
-	}
-
-	rv.insert(rv.end(), ep.data.begin(), ep.data.end());
-
-	return rv;
-}
-
-EncodedPackage
-Serializer::deserialize(const std::vector<char>& rd)
-{
-    assert(rd.size() >= 4 * 2);
-	EncodedPackage ep;
-
-	ep.index = *(uint32_t*)rd.data();
-
-	ep.d = *(uint32_t*)(rd.data() + 4);
-
-	for (size_t i = 0; i < ep.d; i++) {
-		unsigned d = *(uint32_t*)(rd.data() + 4 * (2 + i));
-		ep.adjacency.push_back(d);
-	}
-
-	ep.data.insert(ep.data.end(), rd.begin() + 4 * (2 + ep.d), rd.end());
-
-	return ep;
-}
-
-
-EncodedPackage
-Serializer::deserialize(const std::vector<char>& rd, size_t N)
-{
-    assert(N >= 4 * 2);
-	EncodedPackage ep;
-
-	ep.index = *(uint32_t*)rd.data();
-
-	ep.d = *(uint32_t*)(rd.data() + 4);
-
-	for (size_t i = 0; i < ep.d; i++) {
-		unsigned d = *(uint32_t*)(rd.data() + 4 * (2 + i));
-		ep.adjacency.push_back(d);
-	}
-
-	ep.data.insert(ep.data.end(), rd.begin() + 4 * (2 + ep.d), rd.begin() + N);
-
-	return ep;
+    return encodedpackage;
 }

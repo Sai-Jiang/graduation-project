@@ -1,31 +1,29 @@
 #pragma once
-#include "UDPClient.h"
-#include "BlockQueue.h"
 #include <thread>
+#include "BlockQueue.h"
+#include "EncodedPackage.h"
+#include "Encoder.h"
+#include "Serializer.h"
+#include "UDPClient.h"
 
-class UDPEncodedClient :
-	public UDPClient
-{
-public:
-	UDPEncodedClient(
-		const Encoder& e,
-		const std::string& sender_ip,
-		const std::string& receiver_ip,
-		unsigned sender_port = 8080,
-		unsigned receiver_port = 8080);
-	~UDPEncodedClient();
-	virtual void run();
-	virtual void do_read();
+class UDPEncodedClient : public UDPClient {
+   public:
+    UDPEncodedClient(const Encoder& encoder, const std::string& sender_ip, const std::string& receiver_ip,
+                     unsigned sender_port = 8080, unsigned receiver_port = 8080);
+    ~UDPEncodedClient();
+    virtual void run();
+    virtual void do_read();
 
-private:
+   private:
     void deserialize();
     void decode();
 
-    std::thread des_thd;
-    std::thread dec_thd;
-    BlockQueue<std::vector<char>> des_Q;
-    BlockQueue<std::vector<EncodedPackage>> dec_Q;
+    Encoder encoder;
+    Serializer serializer;
+    std::thread deserialize_thd;
+    std::thread decode_thd;
+    BlockQueue<std::vector<char>> deserialize_Q;
+    BlockQueue<std::vector<EncodedPackage>> decode_Q;
     size_t last_ep_index;
     size_t this_ep_index;
 };
-

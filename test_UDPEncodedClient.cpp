@@ -1,7 +1,8 @@
-#include "common.h"
+#include <stdio.h>
+#include "Encoder.h"
+#include "UDPEncodedClient.h"
 
-int
-main(int argc, char* argv[]) {
+int main(int argc, char* argv[]) {
     if (argc != 3) {
         fprintf(stderr, "./UDPRawServer <sender ip> <receiver ip>\n");
     } else {
